@@ -1,5 +1,6 @@
 const User = require("../models/User")
 
+// User resgister
 exports.register = async (req, res)=>{
     try{
         const {name, email, password} = req.body;
@@ -46,7 +47,7 @@ exports.register = async (req, res)=>{
 }
 
 
-
+// user login
 exports.login = async (req,res)=>{
         try {
             const {email, password} = req.body;
@@ -82,4 +83,57 @@ exports.login = async (req,res)=>{
                 message: error.message,
             })
         }
+}
+
+// User Follow and unfollow
+
+exports.followUser = async (req, res)=>{
+    try {
+        
+        const userToFollow = await User.findById(req.params.id);
+        const logedInUser = await User.findById(req.user._id);
+
+        if(!userToFollow){
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            })
+        }
+
+        if(logedInUser.following.includes(userToFollow._id)){
+
+            const index = logedInUser.following.indexOf(userToFollow._id);
+            logedInUser.following.splice(index,1);
+
+            const index2 = userToFollow.followers.indexOf(logedInUser._id);
+            userToFollow.followers.splice(index2,1);
+
+            await logedInUser.save();
+            await userToFollow.save();
+
+            return res.status(200).json({
+                success: true,
+                message: "User unfollowed",
+                userToFollow,
+            })
+
+        }
+
+        logedInUser.following.push(userToFollow._id);
+        userToFollow.followers.push(logedInUser._id);
+        await logedInUser.save();
+        await userToFollow.save();
+        res.status(200).json({
+            success: true,
+            message: "User followed",
+            userToFollow,
+          });
+
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        })
+    }
 }

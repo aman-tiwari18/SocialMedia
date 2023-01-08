@@ -24,7 +24,7 @@ const UserSchema = new mongoose.Schema({
         minlength: [6, "Password must be at least 6 characters"],
         select : false,
     },
-    post: [
+    posts: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Post",
