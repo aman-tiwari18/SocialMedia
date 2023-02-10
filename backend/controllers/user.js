@@ -1,5 +1,6 @@
 const Post = require("../models/Post");
 const User = require("../models/User")
+const {sendEmail} = require("../middlewares/sendEmail")
 
 // User resgister
 exports.register = async (req, res)=>{
